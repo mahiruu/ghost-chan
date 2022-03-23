@@ -7,6 +7,7 @@
 # only works in places where static ip addresses are allowed (not eduroam)
 
 function gmode {
+    clear
     intf="$1"  
     gint="$2"
     dot="."
@@ -46,7 +47,7 @@ function gmode {
         macchanger -a "$intf" >/dev/null
         ifconfig "$intf" up
         nmcli networking on
-        echo "mac changed $c times"
+        echo "* mac changed $c times"
         notify-send "Ghost-chan: changing mac + ipv4 ($c)"
 		c=$((c+1))
 		sleep "$gint"

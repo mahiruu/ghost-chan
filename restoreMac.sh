@@ -2,6 +2,7 @@
 
 # usage: rmac <interface>
 function rmac {	
+    clear
     interf="$1"
     nmcli networking off
     ifconfig "$interf" down
@@ -9,7 +10,7 @@ function rmac {
     ifconfig "$interf" up
     nmcli networking on
 	./animeGirls/confusedStare.sh 
-    echo "all settings have been reset ~ senpai"
+    echo "* all settings have been reset ~ senpai"
 }
 
 rmac "$1"

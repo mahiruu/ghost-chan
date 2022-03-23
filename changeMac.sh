@@ -2,6 +2,7 @@
 
 # usage: cmac <interface>
 function cmac {
+    clear
     interf="$1"
 	nmcli networking off
 	ifconfig "$interf" down
@@ -9,7 +10,7 @@ function cmac {
 	ifconfig "$interf" up
 	nmcli networking on
 	./animeGirls/giggle.sh
-	echo "hidding successful ~ senpai uwu"
+	echo "* hidding successful ~ senpai uwu"
 }
 
 #  TODO: help menu

@@ -6,6 +6,7 @@
 # has built-in mechanism to prevent assignement of already assigned IPv4 in the network
 # only works in places where static ip addresses are allowed (not eduroam)
 function randomIpAddress {
+    clear
     intf="$1"  
     dot="."
 	zero="0"
@@ -35,7 +36,7 @@ function randomIpAddress {
 			ifconfig "$intf" broadcast "$broadcast"
 			route add default gw "$defaultGW" "$intf" 
             ./animeGirls/smileyWave.sh
-            echo "changing ip address!"
+            echo "* changing ip address!"
 			echo "$newAd"
         fi
     done
