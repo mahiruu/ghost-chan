@@ -9,7 +9,7 @@ function rmac {
     macchanger -p "$interf" >/dev/null
     ifconfig "$interf" up
     nmcli networking on
-	./animeGirls/confusedStare.sh 
+	  ./animeGirls/confusedStare.sh
     echo "* all settings have been reset ~ senpai"
 }
 
