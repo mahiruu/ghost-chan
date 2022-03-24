@@ -12,11 +12,9 @@ function gmode {
     echo "*"
 	  while true
 	  do
-		  nmcli networking off
 	    ifconfig "$interf" down
       macchanger -a "$interf" >/dev/null
       ifconfig "$interf" up
-      nmcli networking on
       echo "* mac changed $c times"
       notify-send "Ghost-chan: changing mac ($c)"
 		  c=$((c+1))

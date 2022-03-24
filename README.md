@@ -1,10 +1,12 @@
 # ghost-chan
 
 Set of tools for automation of network address changing.
+
 For network-manager only.
 Project is in alpha version~
 
-required dependencies: `nmap, net-tools(route, ifconfig), macchanger, bash, network-manager`
+required dependencies: `nmap, net-tools(route, ifconfig), macchanger, bash`
+
 package names may vary by distros
 
 ## Disclaimer
