@@ -5,7 +5,7 @@ Set of tools for automation of network address changing.
 For network-manager only.
 Project is in alpha version~
 
-required dependencies: `nmap, net-tools(route, ifconfig), macchanger, bash`
+required dependencies: `nmap, net-tools(route, ifconfig), macchanger, bash, NetworkManager`
 
 package names may vary by distros
 

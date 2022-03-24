@@ -12,6 +12,7 @@ function gmode {
     echo "*"
 	  while true
 	  do
+	    nmcli networking on
 	    ifconfig "$interf" down
       macchanger -a "$interf" >/dev/null
       ifconfig "$interf" up

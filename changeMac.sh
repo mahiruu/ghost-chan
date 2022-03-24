@@ -4,9 +4,11 @@
 function cmac {
     clear
     interf="$1"
+    nmcli networking off
 	  ifconfig "$interf" down
 	  macchanger -abr "$interf"
 	  ifconfig "$interf" up
+	  nmcli networking on
 	  ./animeGirls/giggle.sh
 	  echo "* hiding successful ~ senpai uwu"
 }
