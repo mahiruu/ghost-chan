@@ -6,7 +6,7 @@ function gmode {
     interf="$1"
     gint="$2"
 	  c=1
-    ./animeGirls/giggle.sh
+    sh ./animeGirls/giggle.sh
     echo "* I will be taking care of your privacy from now on"
     echo "* let's go!"
     echo "*"
@@ -16,7 +16,7 @@ function gmode {
 	    ifconfig "$interf" down
       macchanger -a "$interf" >/dev/null
       ifconfig "$interf" up
-      echo "* mac changed $c times"
+      echo "* mac + ip address changed $c times"
       notify-send "Ghost-chan: changing mac ($c)"
 		  c=$((c+1))
 		  sleep "$gint"

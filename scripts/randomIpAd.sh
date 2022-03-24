@@ -6,12 +6,11 @@
 # has built-in mechanism to prevent assignment of already assigned IPv4 in the network
 # only works in places where static ip addresses are allowed (not eduroam)
 function randomIpAddress {
-    clear
     intf="$1"  
     dot="."
 	  zero="0"
     backslash="/"
-
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     mask=$(ifconfig "$intf" | awk '/netmask/{ print $4;} ')
     transformedAd1=$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f1 | cut -d "." -f1)
 	  transformedAd2=$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f1 | cut -d "." -f2)
@@ -36,7 +35,7 @@ function randomIpAddress {
 			  ifconfig "$intf" netmask "$mask"
 			  ifconfig "$intf" broadcast "$broadcast"
 			  route add default gw "$defaultGW" "$intf"
-        ./animeGirls/smileyWave.sh
+        sh "$SCRIPT_DIR"/animeGirls/smileyWave.sh
         echo "* changing ip address!"
 			  echo "$newAd"
       fi
