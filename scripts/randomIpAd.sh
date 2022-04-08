@@ -11,7 +11,7 @@ function randomIpAddress {
   zero="0"
   backslash="/"
   SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-  mask=$(ifconfig "$intf" | awk '/netmask/{ print $4;} ')
+  mask=$(ifconfig "$intf" | awk '/netmask/{ print $4;} ') # TODO: replace deprecated ifconfig with ip
   transformedAd1=$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f1 | cut -d "." -f1)
   transformedAd2=$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f1 | cut -d "." -f2)
   transformedAd3=$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f1 | cut -d "." -f3)
@@ -21,7 +21,7 @@ function randomIpAddress {
   netWithMask="$net$backslash$(ip addr sh "$intf" | awk '/inet/{ print $2;} ' | head -n +1 | cut -d "/" -f2)"
 
   defaultGW=$(ip route show | head -n +1 | cut -d " " -f3)
-  broadcast=$(ifconfig "$intf" | awk '/broadcast/{ print $6;} ')
+  broadcast=$(ifconfig "$intf" | awk '/broadcast/{ print $6;} ') # TODO: replace deprecated ifconfig with ip
 
   while true; do
     # shellcheck disable=SC2004
@@ -29,6 +29,7 @@ function randomIpAddress {
     newAd="$netbase$dot$rnd"
     list=$(nmap -sn "$netWithMask" | grep "$newAd")
     if [ -z "$list" ]; then
+      # TODO: replace deprecated ifconfig with ip
       ifconfig "$intf" "$newAd"
       ifconfig "$intf" netmask "$mask"
       ifconfig "$intf" broadcast "$broadcast"

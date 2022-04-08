@@ -12,9 +12,9 @@ function gmode {
   echo "*"
   while true; do
     nmcli networking on
-    ifconfig "$interf" down
+    ifconfig "$interf" down # TODO: replace deprecated ifconfig with ip
     macchanger -a "$interf" >/dev/null
-    ifconfig "$interf" up
+    ifconfig "$interf" up # TODO: replace deprecated ifconfig with ip
     echo "* mac + ip address changed $c times"
     notify-send "Ghost-chan: changing mac ($c)"
     c=$((c + 1))
