@@ -5,6 +5,7 @@
 # a function that set static ip address based on the previous ip assigned by dhcp or manually
 # has built-in mechanism to prevent assignment of already assigned IPv4 in the network
 # only works in places where static ip addresses are allowed (not eduroam)
+
 function randomIpAddress {
   intf="$1"
   dot="."
