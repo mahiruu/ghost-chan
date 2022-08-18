@@ -159,13 +159,12 @@ section .text
 
        parent1:
            printString PRESS_ANY_KEY
-           mov rsi, choice
-           mov rdi, CHOICE_1
-           mov rcx, 1
-           jmp _menuLoop
+           ; there should be some message regarding the script being run
+           ; sys_sleep
+           ;jmp _menuLoop
 
        scriptChild1:
-          ; the script wont really be producing a text output
+          ; the script wont really be producing an output
           runBashCommand BASH, args1
           exit
 
