@@ -21,7 +21,7 @@
         syscall
 %endmacro
 
-; 1 = command, 2 = argument
+; 1 = command, 2 = arguments
 %macro runBashCommand 2
     mov rdx, 0 ; no address of environment variable as there are not any
     mov rcx, %2

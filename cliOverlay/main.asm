@@ -19,6 +19,8 @@ section .data
   CHOICE5_MESSAGE db "* press 5 to enter a ghost mode (assigning random IP address and mac address overtime)", 10, 0
   CHOICE6_MESSAGE db "* press 6 to enter a ghost mode - mac only (assigning random mac address overtime)", 10, 0
 
+  PRESS_ANY_KEY db "* press any key to continue", 10, 0
+
   CHOICE_0 db "0",0
   CHOICE_1 db "1",0
   CHOICE_2 db "2",0
@@ -27,7 +29,7 @@ section .data
   CHOICE_5 db "5",0
   CHOICE_6 db "6",0
 
-  NEWLINE db 10, 0h
+  NEWLINE db 10, 0
 
   BASH db '/bin/bash', 0
 
@@ -58,7 +60,7 @@ section .data
       dd interface
       dd 0
 
-  args4 dd BASH
+  args5 dd BASH
       dd GHOST_MODE_MACONLY_SCRIPT
       dd interface
       dd 0
@@ -148,9 +150,25 @@ section .text
        mov rcx, 1
        repe cmpsb
        jne _checkForOption3 ; jump to option 3
-       runBashCommand BASH, args1
-       printString NEWLINE
-       jmp _menuLoop
+
+       ; create a child process for running the script
+       mov rax, 2
+       int 80h
+       cmp rax, 0
+       jz scriptChild1
+
+       parent1:
+           printString PRESS_ANY_KEY
+           mov rsi, choice
+           mov rdi, CHOICE_1
+           mov rcx, 1
+           jmp _menuLoop
+
+       scriptChild1:
+          ; the script wont really be producing a text output
+          runBashCommand BASH, args1
+          exit
+
 
     _checkForOption3:
         jmp _menuLoop
