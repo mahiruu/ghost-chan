@@ -84,13 +84,10 @@ section .text
         syscall
         ret
 
+    ; literally the last issue of this code to push into a working state
+    ; after reading the input it stores all the chars + 10 (code for newline)
+    ; TODO: prevent the newline from appending to the interface as this is breaking the script
     _getInterface:
-;        mov     rdx, 32        ; number of bytes to read
-;        mov     rcx, interface     ; reserved space to store our input (known as a buffer)
-;        mov     rbx, 0          ; write to the STDIN file
-;        mov     rax, 3          ; invoke SYS_READ (kernel opcode 3)
-;        syscall
-;        ret
        mov rax, 0
        mov rdi, 0
        mov rsi, interface
@@ -113,6 +110,11 @@ section .text
         repe cmpsb
         jne _checkForOption2 ; jump to option 2
         call _getInterface
+;        mov rdx, 32        ; number of bytes to read
+;        mov rcx, interface     ; reserved space to store our input (known as a buffer)
+;        mov rbx, 0          ; write to the STDIN file
+;        mov rax, 3          ; invoke SYS_READ (kernel opcode 3)
+;        int 80h
         jmp _menuLoop
 
     _checkForOption2:
@@ -122,11 +124,8 @@ section .text
        repe cmpsb
        jne _checkForOption3 ; jump to option 3
 
-       ;runCommand interface, MACCHANGER_SCRIPT, command, BASH
-       ;runBashCommand ECHO, TESTS
-
-       runBashCommand BASH, args
-       printString NEWLINE
+       ;runBashCommand BASH, args
+       ;printString NEWLINE
 
        exit
 
