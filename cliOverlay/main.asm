@@ -19,7 +19,6 @@ section .data
   CHOICE5_MESSAGE db "* press 5 to enter a ghost mode (assigning random IP address and mac address overtime)", 10, 0
   CHOICE6_MESSAGE db "* press 6 to enter a ghost mode - mac only (assigning random mac address overtime)", 10, 0
 
-
   CHOICE_0 db "0"
   CHOICE_1 db "1"
   CHOICE_2 db "2"
@@ -29,22 +28,28 @@ section .data
   CHOICE_6 db "6"
 
   TESTS db "worked", 10, 0
-  NEWLINE db "*", 10, 0
+  NEWLINE db 10, 0h
 
-  BASH db '/bin/bash',0
+  BASH db '/bin/bash', 0
+  ECHO db '/bin/echo', 0
 
-  ; interface db 'wlo1',0
-  MACCHANGER_SCRIPT db 'scripts/changeMac.sh', 0
-  RESTORE_MAC_SCRIPT db 'scripts/restoreMac.sh', 0
-  RANDOMIP_SCRIPT db 'scripts/randomIpAd.sh', 0
-  GHOST_MODE_SCRIPT db 'scripts/ghostMode.sh', 0
-  GHOST_MODE_MACONLY_SCRIPT db 'scripts/ghostModeMacOnly.sh', 0
+  interf db 'wlo1',0
+  MACCHANGER_SCRIPT db './scripts/changeMac.sh', 0
+  RESTORE_MAC_SCRIPT db './scripts/restoreMac.sh', 0
+  RANDOMIP_SCRIPT db ' scripts/randomIpAd.sh', 0
+  GHOST_MODE_SCRIPT db ' scripts/ghostMode.sh', 0
+  GHOST_MODE_MACONLY_SCRIPT db ' scripts/ghostModeMacOnly.sh', 0
   ; COMMAND dq interface, script, 0
+
+  ar dd BASH
+     dd MACCHANGER_SCRIPT
+     dd interf
+     dd 0
 
 section .bss
     choice resb 8
     interface resb 32
-    script resb 32
+    command resb 64
 
 section .text
     global _start
@@ -111,19 +116,13 @@ section .text
        mov rdi, CHOICE_2
        mov rcx, 1
        repe cmpsb
-       jne _checkForOption3: ; jump to option 3
-       ; call _setCommand
-       ; DOES NOT WORK
-       ;  TODO: assign script and the name of the interface to the array
-       ; just add the two strings together ffs
-;       mov rax, interface
-;       mov [COMMAND], rax
-;       mov rax, MACCHANGER_SCRIPT
-;       mov [COMMAND+32], rax
-;       mov qword [script], rax
-;       printString COMMAND
-       ;runCommand BASH, COMMAND
+       jne _checkForOption3 ; jump to option 3
 
+       ;runCommand interface, MACCHANGER_SCRIPT, command, BASH
+       ;runBashCommand ECHO, TESTS
+
+       runBashCommand BASH, ar
+       printString NEWLINE
        exit
 
     _checkForOption3:
