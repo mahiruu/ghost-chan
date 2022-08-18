@@ -19,37 +19,35 @@ section .data
   CHOICE5_MESSAGE db "* press 5 to enter a ghost mode (assigning random IP address and mac address overtime)", 10, 0
   CHOICE6_MESSAGE db "* press 6 to enter a ghost mode - mac only (assigning random mac address overtime)", 10, 0
 
-  CHOICE_0 db "0"
-  CHOICE_1 db "1"
-  CHOICE_2 db "2"
-  CHOICE_3 db "3"
-  CHOICE_4 db "4"
-  CHOICE_5 db "5"
-  CHOICE_6 db "6"
+  CHOICE_0 db "0",0
+  CHOICE_1 db "1",0
+  CHOICE_2 db "2",0
+  CHOICE_3 db "3",0
+  CHOICE_4 db "4",0
+  CHOICE_5 db "5",0
+  CHOICE_6 db "6",0
 
   TESTS db "worked", 10, 0
   NEWLINE db 10, 0h
 
   BASH db '/bin/bash', 0
-  ECHO db '/bin/echo', 0
 
-  interf db 'wlo1',0
+  interf db 'enp5s0',0
   MACCHANGER_SCRIPT db './scripts/changeMac.sh', 0
   RESTORE_MAC_SCRIPT db './scripts/restoreMac.sh', 0
-  RANDOMIP_SCRIPT db ' scripts/randomIpAd.sh', 0
-  GHOST_MODE_SCRIPT db ' scripts/ghostMode.sh', 0
-  GHOST_MODE_MACONLY_SCRIPT db ' scripts/ghostModeMacOnly.sh', 0
-  ; COMMAND dq interface, script, 0
+  RANDOMIP_SCRIPT db './scripts/randomIpAd.sh', 0
+  GHOST_MODE_SCRIPT db './scripts/ghostMode.sh', 0
+  GHOST_MODE_MACONLY_SCRIPT db './scripts/ghostModeMacOnly.sh', 0
 
-  ar dd BASH
+  args dd BASH
      dd MACCHANGER_SCRIPT
-     dd interf
+     dd interface
      dd 0
 
 section .bss
-    choice resb 8
-    interface resb 32
-    command resb 64
+    choice: resb 8
+    interface: resb 32
+    ; command resb 64
 
 section .text
     global _start
@@ -87,6 +85,12 @@ section .text
         ret
 
     _getInterface:
+;        mov     rdx, 32        ; number of bytes to read
+;        mov     rcx, interface     ; reserved space to store our input (known as a buffer)
+;        mov     rbx, 0          ; write to the STDIN file
+;        mov     rax, 3          ; invoke SYS_READ (kernel opcode 3)
+;        syscall
+;        ret
        mov rax, 0
        mov rdi, 0
        mov rsi, interface
@@ -100,7 +104,7 @@ section .text
         mov rcx, 1
         repe cmpsb
         jne _checkForOption1
-        exit
+        exit ; option 0 means exiting the program
 
     _checkForOption1:
         mov rsi, choice
@@ -121,8 +125,9 @@ section .text
        ;runCommand interface, MACCHANGER_SCRIPT, command, BASH
        ;runBashCommand ECHO, TESTS
 
-       runBashCommand BASH, ar
+       runBashCommand BASH, args
        printString NEWLINE
+
        exit
 
     _checkForOption3:
