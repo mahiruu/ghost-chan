@@ -27,27 +27,46 @@ section .data
   CHOICE_5 db "5",0
   CHOICE_6 db "6",0
 
-  TESTS db "worked", 10, 0
   NEWLINE db 10, 0h
 
   BASH db '/bin/bash', 0
 
-  interf db 'enp5s0',0
   MACCHANGER_SCRIPT db './scripts/changeMac.sh', 0
   RESTORE_MAC_SCRIPT db './scripts/restoreMac.sh', 0
   RANDOMIP_SCRIPT db './scripts/randomIpAd.sh', 0
   GHOST_MODE_SCRIPT db './scripts/ghostMode.sh', 0
   GHOST_MODE_MACONLY_SCRIPT db './scripts/ghostModeMacOnly.sh', 0
 
-  args dd BASH
+  ; making this code nanoseconds faster by pre-allocating all the pointers
+  args1 dd BASH
      dd MACCHANGER_SCRIPT
      dd interface
      dd 0
 
+  args2 dd BASH
+      dd RESTORE_MAC_SCRIPT
+      dd interface
+      dd 0
+
+  args3 dd BASH
+      dd RANDOMIP_SCRIPT
+      dd interface
+      dd 0
+
+  args4 dd BASH
+      dd GHOST_MODE_SCRIPT
+      dd interface
+      dd 0
+
+  args4 dd BASH
+      dd GHOST_MODE_MACONLY_SCRIPT
+      dd interface
+      dd 0
+
 section .bss
     choice: resb 8
     interface: resb 32
-    ; command resb 64
+    newlined_interface: resb 32
 
 section .text
     global _start
@@ -84,15 +103,26 @@ section .text
         syscall
         ret
 
-    ; literally the last issue of this code to push into a working state
-    ; after reading the input it stores all the chars + 10 (code for newline)
-    ; TODO: prevent the newline from appending to the interface as this is breaking the script
     _getInterface:
        mov rax, 0
        mov rdi, 0
-       mov rsi, interface
+       mov rsi, newlined_interface
        mov rdx, 32 ; byte length of interface name
        syscall
+
+       ; removal of newline char
+       mov rdi, interface
+       mov rsi, newlined_interface
+       loopp:
+            mov al, [rsi]
+            cmp al, 10
+            je endd
+            inc rsi
+            mov [rdi], al
+            inc rdi
+            cmp al, 0
+            jne loopp
+       endd:
        ret
 
     _checkForOption0:
@@ -110,11 +140,6 @@ section .text
         repe cmpsb
         jne _checkForOption2 ; jump to option 2
         call _getInterface
-;        mov rdx, 32        ; number of bytes to read
-;        mov rcx, interface     ; reserved space to store our input (known as a buffer)
-;        mov rbx, 0          ; write to the STDIN file
-;        mov rax, 3          ; invoke SYS_READ (kernel opcode 3)
-;        int 80h
         jmp _menuLoop
 
     _checkForOption2:
@@ -123,11 +148,9 @@ section .text
        mov rcx, 1
        repe cmpsb
        jne _checkForOption3 ; jump to option 3
-
-       ;runBashCommand BASH, args
-       ;printString NEWLINE
-
-       exit
+       runBashCommand BASH, args1
+       printString NEWLINE
+       jmp _menuLoop
 
     _checkForOption3:
         jmp _menuLoop

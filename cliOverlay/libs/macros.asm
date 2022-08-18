@@ -30,37 +30,6 @@
     int 0x80
 %endmacro
 
-; input format goes as follows:
-; interface, path_to_script, space_for_joined_interface_command, bash (command /bin/bash)
-; macro joins interface and path to script string and then executes it as a bash command
-%macro runCommand 4
-
-    mov edi, %3   ; Address of output buffer
-    mov esi, %2   ; Address of input buffer
-    loop1:
-        mov al, [esi]
-        inc esi
-        mov [edi], al
-        inc edi
-        cmp al, 0
-        jne loop1
-
-    dec edi            ; Removes the zero
-    mov esi, %1
-    loop2:
-        mov al, [esi]
-        inc esi
-        mov [edi], al
-        inc edi
-        cmp al, 0
-        jne loop2        ; This zero needs to stay
-
-    ;printString %4
-    ;printString %3
-
-    runBashCommand %3, %4
-%endmacro
-
 %macro exit 0
     mov rax, SYS_EXIT
     mov rdi, 0
