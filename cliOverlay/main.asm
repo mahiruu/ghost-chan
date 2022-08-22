@@ -18,8 +18,7 @@ section .data
   CHOICE4_MESSAGE db "* press 4 to assign a random IP address which is located in the current network", 10, 0
   CHOICE5_MESSAGE db "* press 5 to enter a ghost mode (assigning random IP address and mac address overtime)", 10, 0
   CHOICE6_MESSAGE db "* press 6 to enter a ghost mode - mac only (assigning random mac address overtime)", 10, 0
-
-  PRESS_ANY_KEY db "* press any key to continue", 10, 0
+  ERROR_MESSAGE   db "* this is not a viable option", 10, 0
 
   CHOICE_0 db "0",0
   CHOICE_1 db "1",0
@@ -29,7 +28,7 @@ section .data
   CHOICE_5 db "5",0
   CHOICE_6 db "6",0
 
-  NEWLINE db 10, 0
+  NEWLINE db 10, 0h
 
   BASH db '/bin/bash', 0
 
@@ -65,6 +64,12 @@ section .data
       dd interface
       dd 0
 
+  ; losing the extra time by this mess:
+  ; I am only keeping it as a way to show how to change the values in pointer
+  timeval:
+      tv_sec  dd 0
+      tv_nsec dd 0
+
 section .bss
     choice: resb 8
     interface: resb 32
@@ -94,7 +99,6 @@ section .text
         printString CHOICE5_MESSAGE
         printString CHOICE6_MESSAGE
 
-        syscall
         ret
 
     _getUserChoice:
@@ -151,23 +155,83 @@ section .text
        repe cmpsb
        jne _checkForOption3 ; jump to option 3
 
-       ; create a child process for running the script
+       ; SYS_FORK
        mov rax, 2
        int 80h
+
        cmp rax, 0
-       jz scriptChild1
+       jz  script_exec1
 
        parent1:
-           printString PRESS_ANY_KEY
-           ; there should be some message regarding the script being run
-           ; sys_sleep
-           ;jmp _menuLoop
+           ; not the best solution but it does the job
+           mov dword [tv_sec], 1
+           mov dword [tv_nsec], 0
 
-       scriptChild1:
-          ; the script wont really be producing an output
-          runBashCommand BASH, args1
-          exit
+           mov rax, 162
+           mov rbx, timeval
+           mov rcx, 0
+           int 0x80
+           ;printString NEWLINE
+           jmp _menuLoop
 
+       script_exec1:
+           runBashCommand BASH, args1
+           exit ;redundant as the script calls for exit itself
 
     _checkForOption3:
+       mov rsi, choice
+       mov rdi, CHOICE_3
+       mov rcx, 1
+       repe cmpsb
+       jne _checkForOption4
+
+       ; SYS_FORK
+       mov rax, 2
+       int 80h
+
+       cmp rax, 0
+       jz  script_exec2
+
+       parent2:
+       ; not the best solution but it does the job
+       mov dword [tv_sec], 1
+       mov dword [tv_nsec], 0
+
+       mov rax, 162
+       mov rbx, timeval
+       mov rcx, 0
+       int 0x80
+       jmp _menuLoop
+
+       script_exec2:
+       runBashCommand BASH, args2
+       exit ;redundant as the script calls for exit itself
+
+
+    _checkForOption4:
+        mov rsi, choice
+        mov rdi, CHOICE_4
+        mov rcx, 1
+        repe cmpsb
+        jne _checkForOption5
+        jmp _menuLoop
+
+    _checkForOption5:
+        mov rsi, choice
+        mov rdi, CHOICE_5
+        mov rcx, 1
+        repe cmpsb
+        jne _checkForOption6
+        jmp _menuLoop
+
+    _checkForOption6:
+        mov rsi, choice
+        mov rdi, CHOICE_6
+        mov rcx, 1
+        repe cmpsb
+        jne _errorMSG
+        jmp _menuLoop
+
+    _errorMSG:
+        printString ERROR_MESSAGE
         jmp _menuLoop
